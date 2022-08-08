@@ -20,12 +20,11 @@ type Server interface {
 type sdkHttpServer struct {
 	// Name server 的名字，给个标记，日志输出的时候用的上
 	Name    string
-	handler *HandlerBasedOnMap // 基于 map 的路由
+	handler Handler // 基于 map 的路由
 }
 
 func (s *sdkHttpServer) Route(method string, pattern string, handlerFunc func(ctx *Context)) {
-	key := s.handler.key(method, pattern)
-	s.handler.handlers[key] = handlerFunc
+	s.handler.Route(method, pattern, handlerFunc)
 }
 
 func (s *sdkHttpServer) Start(address string) error {
@@ -37,7 +36,8 @@ func (s *sdkHttpServer) Start(address string) error {
 func NewHttpServer(name string) Server {
 	// 返回一个实际类型是我实现接口的时候，需要取址
 	return &sdkHttpServer{
-		Name: name,
+		Name:    name,
+		handler: NewHandlerBasedOnMap(),
 	}
 }
 
