@@ -7,10 +7,7 @@ import (
 
 // Server 是 http server 的顶级抽象
 type Server interface {
-
-	// Route 设定一个路由，命中该路由的会执行 handlerFunc 的代码
-	// method POST, GET, PUT
-	Route(method string, pattern string, handlerFunc func(ctx *Context))
+	Routable
 
 	// Start 启动我们的服务器
 	Start(address string) error
