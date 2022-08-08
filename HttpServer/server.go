@@ -1,6 +1,11 @@
 package main
 
-import "net/http"
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+)
 
 // Server 是 http server 的顶级抽象
 type Server interface {
@@ -31,4 +36,45 @@ func NewHttpServer(name string) Server {
 	return &sdkHttpServer{
 		Name: name,
 	}
+}
+
+func SignUp(w http.ResponseWriter, r *http.Request) {
+	req := &signUpReq{}
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		fmt.Fprintf(w, "read body failed: %v", err)
+		// 要返回掉，不然就会继续执行后面的代码
+		return
+	}
+	err = json.Unmarshal(body, req)
+	if err != nil {
+		fmt.Fprintf(w, "deserialized failed: %v", err)
+		// 要返回掉，不然就会继续执行后面的代码
+		return
+	}
+
+	// 返回一个虚拟的 user id 表示注册成功了
+	fmt.Fprintf(w, "%d", 123)
+
+	// 返回 json 对象
+	resp := &commonResponse{
+		Data: 123,
+	}
+	respJson, err := json.Marshal(resp)
+	if err != nil {
+
+	}
+	fmt.Fprintf(w, string(respJson)) // []byte 和 string 可以互转
+}
+
+type signUpReq struct {
+	Email             string `json:"email"`
+	Password          string `json:"password"`
+	ConfirmedPassword string `json:"confirmed_password"`
+}
+
+type commonResponse struct {
+	BizCode int         `json:"biz_code"`
+	Msg     string      `json:"msg"`
+	Data    interface{} `json:"data"`
 }

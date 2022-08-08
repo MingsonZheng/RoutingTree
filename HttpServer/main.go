@@ -27,5 +27,6 @@ func main() {
 	server.Route("/user", user)
 	server.Route("/user/create", createUser)
 	server.Route("/order", order)
+	server.Route("/user/signup", SignUp)
 	server.Start(":8080")
 }
