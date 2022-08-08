@@ -23,10 +23,10 @@ func order(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	server := NewHttpServer("test-server")
-	server.Route("/", home)
-	server.Route("/user", user)
-	server.Route("/user/create", createUser)
-	server.Route("/order", order)
+	//server.Route("/", home)
+	//server.Route("/user", user)
+	//server.Route("/user/create", createUser)
+	//server.Route("/order", order)
 	server.Route("/user/signup", SignUp)
 	server.Start(":8080")
 }

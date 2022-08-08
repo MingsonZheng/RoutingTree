@@ -9,7 +9,7 @@ import (
 type Server interface {
 
 	// Route 设定一个路由，命中该路由的会执行 handlerFunc 的代码
-	Route(pattern string, handlerFunc http.HandlerFunc)
+	Route(pattern string, handlerFunc func(ctx *Context))
 
 	// Start 启动我们的服务器
 	Start(address string) error
@@ -21,8 +21,11 @@ type sdkHttpServer struct {
 	Name string
 }
 
-func (s *sdkHttpServer) Route(pattern string, handlerFunc http.HandlerFunc) {
-	http.HandleFunc(pattern, handlerFunc)
+func (s *sdkHttpServer) Route(pattern string, handlerFunc func(ctx *Context)) {
+	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
+		ctx := NewContext(w, r)
+		handlerFunc(ctx)
+	})
 }
 
 func (s *sdkHttpServer) Start(address string) error {
@@ -36,20 +39,16 @@ func NewHttpServer(name string) Server {
 	}
 }
 
-func SignUp(w http.ResponseWriter, r *http.Request) {
+func SignUp(ctx *Context) {
 	req := &signUpReq{}
-	ctx := &Context{
-		W: w,
-		R: r,
-	}
 	err := ctx.ReadJson(req)
 	if err != nil {
-		fmt.Fprintf(w, "err: %v", err)
+		ctx.BadRequestJson(err)
 		return
 	}
 
 	// 返回一个虚拟的 user id 表示注册成功了
-	fmt.Fprintf(w, "%d", 123)
+	fmt.Fprintf(ctx.W, "%d", 123)
 
 	// 返回 json 对象
 	resp := &commonResponse{
