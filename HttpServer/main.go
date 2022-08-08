@@ -22,9 +22,10 @@ func order(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", home)
-	http.HandleFunc("/user", user)
-	http.HandleFunc("/user/create", createUser)
-	http.HandleFunc("/order", order)
-	http.ListenAndServe(":8080", nil)
+	server := NewHttpServer("test-server")
+	server.Route("/", home)
+	server.Route("/user", user)
+	server.Route("/user/create", createUser)
+	server.Route("/order", order)
+	server.Start(":8080")
 }
