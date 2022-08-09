@@ -18,6 +18,7 @@ type sdkHttpServer struct {
 	// Name server 的名字，给个标记，日志输出的时候用的上
 	Name    string
 	handler Handler // 基于 map 的路由
+	root    Filter  // 我们希望请求在真正被处理之前能够经过一大堆的 filter
 }
 
 func (s *sdkHttpServer) Route(method string, pattern string, handlerFunc func(ctx *Context)) {
@@ -25,16 +26,28 @@ func (s *sdkHttpServer) Route(method string, pattern string, handlerFunc func(ct
 }
 
 func (s *sdkHttpServer) Start(address string) error {
-	handler := s.handler
-	http.Handle("/", handler)
+	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		c := NewContext(writer, request)
+		s.root(c)
+	})
 	return http.ListenAndServe(address, nil)
 }
 
-func NewHttpServer(name string) Server {
+func NewHttpServer(name string, builders ...FilterBuilder) Server {
+	handler := NewHandlerBasedOnMap()
+	var root Filter = func(c *Context) {
+		handler.ServeHTTP(c.W, c.R)
+	}
+	// 从后往前调用 method，所以要从后往前组装好
+	for i := len(builders); i >= 0; i-- {
+		b := builders[i]
+		root = b(root)
+	}
 	// 返回一个实际类型是我实现接口的时候，需要取址
 	return &sdkHttpServer{
 		Name:    name,
-		handler: NewHandlerBasedOnMap(),
+		handler: handler,
+		root:    root,
 	}
 }
 

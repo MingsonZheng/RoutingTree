@@ -28,5 +28,8 @@ func main() {
 	//server.Route("/user/create", createUser)
 	//server.Route("/order", order)
 	server.Route("POST", "/user/signup", SignUp)
-	server.Start(":8080")
+	err := server.Start(":8080")
+	if err != nil {
+		panic(err)
+	}
 }
