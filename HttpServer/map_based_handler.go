@@ -5,10 +5,12 @@ import (
 	"sync"
 )
 
+type handlerFunc func(ctx *Context)
+
 type Routable interface {
 	// Route 设定一个路由，命中该路由的会执行 handlerFunc 的代码
 	// method POST, GET, PUT
-	Route(method string, pattern string, handlerFunc func(ctx *Context)) // server 可以把 Route 委托给这边的 Handler
+	Route(method string, pattern string, handlerFunc handlerFunc) // server 可以把 Route 委托给这边的 Handler
 }
 
 type Handler interface {
