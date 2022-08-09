@@ -18,6 +18,12 @@ type HandlerBasedOnTree struct {
 	root *node
 }
 
+func NewHandlerBasedOnTree() Handler {
+	return &HandlerBasedOnTree{
+		root: &node{},
+	}
+}
+
 // ServeHTTP 就是从树里面找节点
 // 找到了就执行
 func (h *HandlerBasedOnTree) ServeHTTP(c *Context) {
