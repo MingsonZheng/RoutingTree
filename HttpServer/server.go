@@ -21,7 +21,7 @@ type sdkHttpServer struct {
 	root    Filter  // 我们希望请求在真正被处理之前能够经过一大堆的 filter
 }
 
-func (s *sdkHttpServer) Route(method string, pattern string, handlerFunc func(ctx *Context)) {
+func (s *sdkHttpServer) Route(method string, pattern string, handlerFunc handlerFunc) {
 	s.handler.Route(method, pattern, handlerFunc)
 }
 

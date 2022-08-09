@@ -24,7 +24,7 @@ type HandlerBasedOnMap struct {
 	handlers sync.Map
 }
 
-func (h *HandlerBasedOnMap) Route(method string, pattern string, handlerFunc func(ctx *Context)) {
+func (h *HandlerBasedOnMap) Route(method string, pattern string, handlerFunc handlerFunc) {
 	key := h.key(method, pattern)
 	h.handlers.Store(key, handlerFunc)
 }
@@ -48,6 +48,6 @@ func (h *HandlerBasedOnMap) key(method string, pattern string) string {
 
 func NewHandlerBasedOnMap() Handler {
 	return &HandlerBasedOnMap{
-		handlers: make(map[string]func(ctx *Context)),
+		handlers: sync.Map{},
 	}
 }
